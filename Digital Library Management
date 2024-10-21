@@ -1,0 +1,229 @@
+import java.util.ArrayList;
+import java.util.Scanner;
+
+// Book class to represent each book in the library
+class Book {
+    int id;
+    String title;
+    String author;
+    boolean isIssued;
+
+    public Book(int id, String title, String author) {
+        this.id = id;
+        this.title = title;
+        this.author = author;
+        this.isIssued = false;
+    }
+}
+
+// User class to represent a user
+class User {
+    String name;
+    String email;
+
+    public User(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
+}
+
+// Admin class with complete control over the library system
+class Admin {
+    ArrayList<Book> books;
+    ArrayList<User> users;
+
+    public Admin() {
+        books = new ArrayList<>();
+        users = new ArrayList<>();
+    }
+
+    // Method to add a book
+    public void addBook(int id, String title, String author) {
+        Book newBook = new Book(id, title, author);
+        books.add(newBook);
+        System.out.println("Book added successfully.");
+    }
+
+    // Method to delete a book
+    public void deleteBook(int id) {
+        for (Book book : books) {
+            if (book.id == id) {
+                books.remove(book);
+                System.out.println("Book deleted successfully.");
+                return;
+            }
+        }
+        System.out.println("Book not found.");
+    }
+
+    // Method to update a book's details
+    public void updateBook(int id, String newTitle, String newAuthor) {
+        for (Book book : books) {
+            if (book.id == id) {
+                book.title = newTitle;
+                book.author = newAuthor;
+                System.out.println("Book updated successfully.");
+                return;
+            }
+        }
+        System.out.println("Book not found.");
+    }
+
+    // Method to add a user
+    public void addUser(String name, String email) {
+        User newUser = new User(name, email);
+        users.add(newUser);
+        System.out.println("User added successfully.");
+    }
+}
+
+// UserModule class to allow user interaction
+class UserModule {
+    ArrayList<Book> books;
+
+    public UserModule(ArrayList<Book> books) {
+        this.books = books;
+    }
+
+    // Method to view all books
+    public void viewBooks() {
+        System.out.println("List of available books:");
+        for (Book book : books) {
+            if (!book.isIssued) {
+                System.out.println("ID: " + book.id + ", Title: " + book.title + ", Author: " + book.author);
+            }
+        }
+    }
+
+    // Method to search for a book by title
+    public void searchBook(String title) {
+        for (Book book : books) {
+            if (book.title.equalsIgnoreCase(title)) {
+                System.out.println("Book found: ID: " + book.id + ", Title: " + book.title + ", Author: " + book.author + ", Issued: " + (book.isIssued ? "Yes" : "No"));
+                return;
+            }
+        }
+        System.out.println("Book not found.");
+    }
+
+    // Method to issue a book
+    public void issueBook(int id) {
+        for (Book book : books) {
+            if (book.id == id && !book.isIssued) {
+                book.isIssued = true;
+                System.out.println("Book issued successfully.");
+                return;
+            }
+        }
+        System.out.println("Book not available or already issued.");
+    }
+
+    // Method to return a book
+    public void returnBook(int id) {
+        for (Book book : books) {
+            if (book.id == id && book.isIssued) {
+                book.isIssued = false;
+                System.out.println("Book returned successfully.");
+                return;
+            }
+        }
+        System.out.println("Book not found or not issued.");
+    }
+}
+
+public class LibraryManagementSystem {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        Admin admin = new Admin();
+        UserModule userModule = new UserModule(admin.books);
+        boolean exit = false;
+
+        while (!exit) {
+            System.out.println("\n1. Admin Login\n2. User Login\n3. Exit");
+            int choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    System.out.println("Admin Panel");
+                    boolean adminExit = false;
+                    while (!adminExit) {
+                        System.out.println("1. Add Book\n2. Delete Book\n3. Update Book\n4. Add User\n5. Logout");
+                        int adminChoice = scanner.nextInt();
+                        switch (adminChoice) {
+                            case 1:
+                                System.out.println("Enter book id, title and author:");
+                                int id = scanner.nextInt();
+                                scanner.nextLine(); // consume newline
+                                String title = scanner.nextLine();
+                                String author = scanner.nextLine();
+                                admin.addBook(id, title, author);
+                                break;
+                            case 2:
+                                System.out.println("Enter book id to delete:");
+                                int delId = scanner.nextInt();
+                                admin.deleteBook(delId);
+                                break;
+                            case 3:
+                                System.out.println("Enter book id to update, new title and author:");
+                                int updId = scanner.nextInt();
+                                scanner.nextLine(); // consume newline
+                                String newTitle = scanner.nextLine();
+                                String newAuthor = scanner.nextLine();
+                                admin.updateBook(updId, newTitle, newAuthor);
+                                break;
+                            case 4:
+                                System.out.println("Enter user name and email:");
+                                scanner.nextLine(); // consume newline
+                                String name = scanner.nextLine();
+                                String email = scanner.nextLine();
+                                admin.addUser(name, email);
+                                break;
+                            case 5:
+                                adminExit = true;
+                                break;
+                        }
+                    }
+                    break;
+                case 2:
+                    System.out.println("User Panel");
+                    boolean userExit = false;
+                    while (!userExit) {
+                        System.out.println("1. View Books\n2. Search Book\n3. Issue Book\n4. Return Book\n5. Logout");
+                        int userChoice = scanner.nextInt();
+                        switch (userChoice) {
+                            case 1:
+                                userModule.viewBooks();
+                                break;
+                            case 2:
+                                System.out.println("Enter book title to search:");
+                                scanner.nextLine(); // consume newline
+                                String searchTitle = scanner.nextLine();
+                                userModule.searchBook(searchTitle);
+                                break;
+                            case 3:
+                                System.out.println("Enter book id to issue:");
+                                int issueId = scanner.nextInt();
+                                userModule.issueBook(issueId);
+                                break;
+                            case 4:
+                                System.out.println("Enter book id to return:");
+                                int returnId = scanner.nextInt();
+                                userModule.returnBook(returnId);
+                                break;
+                            case 5:
+                                userExit = true;
+                                break;
+                        }
+                    }
+                    break;
+                case 3:
+                    exit = true;
+                    break;
+                default:
+                    System.out.println("Invalid choice.");
+            }
+        }
+
+        scanner.close();
+    }
+}
